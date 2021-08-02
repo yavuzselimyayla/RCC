@@ -1,45 +1,50 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class TrackCheckpoints : MonoBehaviour {
 
     public event EventHandler OnPlayerCorrectCheckpoint;
     public event EventHandler OnPlayerWrongCheckpoint;
+    public event Action<bool> OnPlayerLastCheckpoint;
 
-    [SerializeField] private List<Transform> carTransformList;
+    public List<CheckpointSingle> checkpointSingleList;
 
-    private List<CheckpointSingle> checkpointSingleList;
+    public List<RCC_CarControllerV3> carControllerList;
     private List<int> nextCheckpointSingleIndexList;
 
     private void Awake() {
-        Transform checkpointsTransform = transform.Find("Checkpoints");
-
-        checkpointSingleList = new List<CheckpointSingle>();
-        foreach (Transform checkpointSingleTransform in checkpointsTransform) {
-            CheckpointSingle checkpointSingle = checkpointSingleTransform.GetComponent<CheckpointSingle>();
-
+        foreach (var checkpointSingle in checkpointSingleList)
             checkpointSingle.SetTrackCheckpoints(this);
-
-            checkpointSingleList.Add(checkpointSingle);
-        }
-
-        nextCheckpointSingleIndexList = new List<int>();
-        foreach (Transform carTransform in carTransformList) {
-            nextCheckpointSingleIndexList.Add(0);
-        }
+        
+        RefreshCarList();
     }
 
-    public void CarThroughCheckpoint(CheckpointSingle checkpointSingle, Transform carTransform) {
-        int nextCheckpointSingleIndex = nextCheckpointSingleIndexList[carTransformList.IndexOf(carTransform)];
+    // TODO: Daha temiz yazılmalı
+    public void RefreshCarList() {
+        carControllerList = FindObjectsOfType<RCC_CarControllerV3>().ToList();
+
+        nextCheckpointSingleIndexList = new List<int>();
+        foreach (var carController in carControllerList)
+            nextCheckpointSingleIndexList.Add(0);
+    }
+
+    public void CarThroughCheckpoint(CheckpointSingle checkpointSingle, RCC_CarControllerV3 carController) {        
+        int nextCheckpointSingleIndex = nextCheckpointSingleIndexList[carControllerList.IndexOf(carController)];
         if (checkpointSingleList.IndexOf(checkpointSingle) == nextCheckpointSingleIndex) {
             // Correct checkpoint
             Debug.Log("Correct");
+
+            if (checkpointSingle == checkpointSingleList.Last()) {
+                EndRace(carController.GetComponent<RCC_PhotonNetwork>().isMine);
+                return;
+            }
+
             CheckpointSingle correctCheckpointSingle = checkpointSingleList[nextCheckpointSingleIndex];
             correctCheckpointSingle.Hide();
 
-            nextCheckpointSingleIndexList[carTransformList.IndexOf(carTransform)]
+            nextCheckpointSingleIndexList[carControllerList.IndexOf(carController)]
                 = (nextCheckpointSingleIndex + 1) % checkpointSingleList.Count;
             OnPlayerCorrectCheckpoint?.Invoke(this, EventArgs.Empty);
         } else {
@@ -52,5 +57,9 @@ public class TrackCheckpoints : MonoBehaviour {
         }
     }
 
+    private void EndRace(bool isMe) {
+        print("EndRace");
+        OnPlayerLastCheckpoint?.Invoke(isMe);
 
+    }
 }

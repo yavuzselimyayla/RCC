@@ -7,12 +7,10 @@
 //
 //----------------------------------------------
 
+using Photon.Pun;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
-using Photon;
-using Photon.Pun;
-using Photon.Realtime;
 
 /// <summary>
 /// Connects to Photon Server, registers the player, and activates player UI panel when connected.
@@ -63,10 +61,10 @@ public class RCC_PhotonManager : Photon.Pun.MonoBehaviourPunCallbacks {
 		if(!Photon.Pun.PhotonNetwork.IsConnectedAndReady)
 			GUI.color = Color.red;
 		
-		GUILayout.Label("State: " + Photon.Pun.PhotonNetwork.NetworkClientState.ToString());
+		GUILayout.Label("State: " + PhotonNetwork.NetworkClientState.ToString());
 		GUI.color = Color.white;
 		GUILayout.Label("Total Player Count: " + Photon.Pun.PhotonNetwork.PlayerList.Length.ToString());
-		GUILayout.Label("Ping: " + Photon.Pun.PhotonNetwork.GetPing().ToString());
+		GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString());
 
 	}
 
@@ -95,12 +93,17 @@ public class RCC_PhotonManager : Photon.Pun.MonoBehaviourPunCallbacks {
 		print("Joined room");
 		RCC_InfoLabel.Instance.ShowInfo ("Joined Room. You can spawn your vehicle.");
 
-		photonRace.Spawn();
+		StartCoroutine(WaitForPlayers());
+	}
+
+	public IEnumerator WaitForPlayers() {
+		yield return new WaitUntil(() => PhotonNetwork.CountOfPlayers > 1);
+		photonRace.BeginRace();
 	}
 
 	public void SetPlayerName(string name){
 
-		Photon.Pun.PhotonNetwork.NickName = name;
+		PhotonNetwork.NickName = name;
 		playerName.gameObject.SetActive(false);
 		RCC_SceneManager.Instance.activePlayerCanvas.SetDisplayType (RCC_UIDashboardDisplay.DisplayType.Full);
 

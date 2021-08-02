@@ -10,12 +10,12 @@ public class CheckpointSingle : MonoBehaviour {
     }
 
     private void Start() {
-        Hide();
+        //Hide();
     }
 
     private void OnTriggerEnter(Collider other) {
         if (other.CompareTag("Player")) {
-            trackCheckpoints.CarThroughCheckpoint(this, other.transform);
+            trackCheckpoints.CarThroughCheckpoint(this, other.GetComponentInParent<RCC_CarControllerV3>());
         }
     }
 
