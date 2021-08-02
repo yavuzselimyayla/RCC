@@ -26,7 +26,7 @@ public class TrackCheckpoints : MonoBehaviour {
     [ContextMenu("Refresh")]
     public void RefreshCarList() {
         carControllerList = FindObjectsOfType<RCC_CarControllerV3>().ToList();
-        
+
         nextCheckpointSingleIndexList = new List<int>();
         for (int i = 0; i < carControllerList.Count; i++) {
             carControllerList[i].transform.position = raceStartPoints[i].position;
@@ -34,7 +34,7 @@ public class TrackCheckpoints : MonoBehaviour {
         }
     }
 
-    public void CarThroughCheckpoint(CheckpointSingle checkpointSingle, RCC_CarControllerV3 carController) {        
+    public void CarThroughCheckpoint(CheckpointSingle checkpointSingle, RCC_CarControllerV3 carController) {
         int nextCheckpointSingleIndex = nextCheckpointSingleIndexList[carControllerList.IndexOf(carController)];
         if (checkpointSingleList.IndexOf(checkpointSingle) == nextCheckpointSingleIndex) {
             // Correct checkpoint
@@ -46,12 +46,11 @@ public class TrackCheckpoints : MonoBehaviour {
                 if (isMe)
                     playerName = PhotonNetwork.NickName;
                 else
-                    foreach (var player in PhotonNetwork.CurrentRoom.Players.Values) {
+                    foreach (var player in PhotonNetwork.CurrentRoom.Players.Values)
                         if (player.NickName != PhotonNetwork.NickName)
                             playerName = player.NickName;
-                    }
-                
-                EndRace(playerName,isMe);
+
+                EndRace(playerName, isMe);
                 return;
             }
 
@@ -61,7 +60,8 @@ public class TrackCheckpoints : MonoBehaviour {
             nextCheckpointSingleIndexList[carControllerList.IndexOf(carController)]
                 = (nextCheckpointSingleIndex + 1) % checkpointSingleList.Count;
             OnPlayerCorrectCheckpoint?.Invoke(this, EventArgs.Empty);
-        } else {
+        }
+        else {
             // Wrong checkpoint
             Debug.Log("Wrong");
             OnPlayerWrongCheckpoint?.Invoke(this, EventArgs.Empty);
@@ -71,8 +71,8 @@ public class TrackCheckpoints : MonoBehaviour {
         }
     }
 
-    private void EndRace(string playerName,bool isMe) {
+    private void EndRace(string playerName, bool isMe) {
         print("EndRace");
-        OnPlayerLastCheckpoint?.Invoke(playerName,isMe);
+        OnPlayerLastCheckpoint?.Invoke(playerName, isMe);
     }
 }

@@ -19,17 +19,22 @@ public class RCC_PhotonRace : MonoBehaviourPun {
 
     public void SelectVehicle(int index) => selectedCarIndex = index;
 
-    [PunRPC]
-   public void BeginRace() {
+   public void ReadyRace() {
         Spawn();
-        trackCheckpoints.OnPlayerLastCheckpoint += TrackCheckpoints_OnPlayerLastCheckpoint1;
+        trackCheckpoints.OnPlayerLastCheckpoint += TrackCheckpoints_OnPlayerLastCheckpoint;
         StartCoroutine(Count());
     }
 
-    
+    [PunRPC]
+    public void BeginRace() {
+        foreach (var car in trackCheckpoints.carControllerList) {
+            if (car.GetComponent<RCC_PhotonNetwork>().isMine)
+                car.SetCanControl(true);
+        }
+    }
+
     private IEnumerator Count() {
-        while (PhotonNetwork.CurrentRoom.PlayerCount <= 1)
-            yield return null;
+        yield return new WaitForSeconds(0.5f);
 
         trackCheckpoints.RefreshCarList();
         
@@ -42,11 +47,7 @@ public class RCC_PhotonRace : MonoBehaviourPun {
 
             yield return new WaitForSeconds(1);
         }
-        
-        foreach (var car in trackCheckpoints.carControllerList) {
-            if (car.GetComponent<RCC_PhotonNetwork>().isMine)
-                car.SetCanControl(true);
-        }
+        BeginRace();
     }
 
     public void Spawn() {
@@ -85,19 +86,20 @@ public class RCC_PhotonRace : MonoBehaviourPun {
     }
 
 
-    private void TrackCheckpoints_OnPlayerLastCheckpoint1(string playerName, bool isMe) {
+    public void TrackCheckpoints_OnPlayerLastCheckpoint(string playerName, bool isMe) {
         rankings.Add($"{rankings.Count+1}. {playerName}");
         string rankList = "";
-        foreach(var rank in rankList) {
+        foreach(var rank in rankings) {
             rankList += rank + "\n";
         }
 
         endPanel.SetActive(true);
         rankingText.text = rankList;
+        Debug.Log(rankList);
 
         foreach (var car in trackCheckpoints.carControllerList) {
             if (car.GetComponent<RCC_PhotonNetwork>().isMine)
-                car.SetCanControl(true);
+                car.SetCanControl(false);
         }
     }
 

@@ -95,11 +95,10 @@ public class RCC_PhotonManager : Photon.Pun.MonoBehaviourPunCallbacks {
 	}
 
 	public IEnumerator WaitForPlayers() {
-        while (PhotonNetwork.CurrentRoom.PlayerCount <= 1) {
+        while (PhotonNetwork.CurrentRoom.PlayerCount <= 1)
 			yield return null;
-		}
 		
-		photonRace.BeginRace();
+		photonRace.ReadyRace();
 	}
 
 	public void SetPlayerName(string name){

@@ -3035,7 +3035,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &259489700
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8660,6 +8660,8 @@ MonoBehaviour:
   spawnPoint: {fileID: 1136538526}
   countTime: 3
   rankings: []
+  endPanel: {fileID: 259489699}
+  rankingText: {fileID: 1539326737}
 --- !u!1 &944572181
 GameObject:
   m_ObjectHideFlags: 0

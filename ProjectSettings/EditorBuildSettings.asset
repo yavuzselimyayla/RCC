@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/RealisticCarControllerV3/Demo Scenes/RCC City Photon PUN 2.unity
+    path: Assets/Scenes/Multiplayer Race.unity
     guid: da0b0d1a276e0bb458280896b1b1bf30
   m_configObjects: {}
