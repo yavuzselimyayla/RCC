@@ -201,9 +201,9 @@ public class RCC_PhotonNetwork : Photon.Pun.MonoBehaviourPunCallbacks, IPunObser
 
 		isMine = photonView.IsMine;
 
-		// If we are the owner of this vehicle, disable external controller and enable controller of the vehicle. Do opposite if we don't own this.
-		carController.externalController = !isMine;
-		carController.canControl = isMine;
+		//TODO: If we are the owner of this vehicle, disable external controller and enable controller of the vehicle. Do opposite if we don't own this.
+		//carController.externalController = !isMine;
+		//carController.canControl = isMine;
 
 		// If we are not owner of this vehicle, receive all inputs from server.
 		if(!isMine) {

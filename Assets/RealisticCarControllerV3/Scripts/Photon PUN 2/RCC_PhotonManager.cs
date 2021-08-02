@@ -80,8 +80,7 @@ public class RCC_PhotonManager : Photon.Pun.MonoBehaviourPunCallbacks {
 		PhotonNetwork.JoinRandomOrCreateRoom();
 	}
 
-
-    public override void OnJoinRandomFailed(short a, string b){
+	public override void OnJoinRandomFailed(short a, string b){
 
 		print("Joining to random room has failed!, Creating new room...");
 		RCC_InfoLabel.Instance.ShowInfo ("Joining to random room has failed!, Creating new room...");
@@ -91,22 +90,21 @@ public class RCC_PhotonManager : Photon.Pun.MonoBehaviourPunCallbacks {
 
 	public override void OnJoinedRoom(){
 		print("Joined room");
-		RCC_InfoLabel.Instance.ShowInfo ("Joined Room. You can spawn your vehicle.");
-
+		RCC_InfoLabel.Instance.ShowInfo ("Joined Room. Waiting for opponents");
 		StartCoroutine(WaitForPlayers());
 	}
 
 	public IEnumerator WaitForPlayers() {
-		yield return new WaitUntil(() => PhotonNetwork.CountOfPlayers > 1);
+        while (PhotonNetwork.CurrentRoom.PlayerCount <= 1) {
+			yield return null;
+		}
+		
 		photonRace.BeginRace();
 	}
 
 	public void SetPlayerName(string name){
-
 		PhotonNetwork.NickName = name;
 		playerName.gameObject.SetActive(false);
 		RCC_SceneManager.Instance.activePlayerCanvas.SetDisplayType (RCC_UIDashboardDisplay.DisplayType.Full);
-
 	}
-
 }

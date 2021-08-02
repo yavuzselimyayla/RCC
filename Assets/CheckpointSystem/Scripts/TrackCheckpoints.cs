@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Pun;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,7 +8,9 @@ public class TrackCheckpoints : MonoBehaviour {
 
     public event EventHandler OnPlayerCorrectCheckpoint;
     public event EventHandler OnPlayerWrongCheckpoint;
-    public event Action<bool> OnPlayerLastCheckpoint;
+    public event Action<string, bool> OnPlayerLastCheckpoint;
+
+    public Transform[] raceStartPoints;
 
     public List<CheckpointSingle> checkpointSingleList;
 
@@ -17,17 +20,18 @@ public class TrackCheckpoints : MonoBehaviour {
     private void Awake() {
         foreach (var checkpointSingle in checkpointSingleList)
             checkpointSingle.SetTrackCheckpoints(this);
-        
-        RefreshCarList();
     }
 
     // TODO: Daha temiz yazılmalı
+    [ContextMenu("Refresh")]
     public void RefreshCarList() {
         carControllerList = FindObjectsOfType<RCC_CarControllerV3>().ToList();
-
+        
         nextCheckpointSingleIndexList = new List<int>();
-        foreach (var carController in carControllerList)
+        for (int i = 0; i < carControllerList.Count; i++) {
+            carControllerList[i].transform.position = raceStartPoints[i].position;
             nextCheckpointSingleIndexList.Add(0);
+        }
     }
 
     public void CarThroughCheckpoint(CheckpointSingle checkpointSingle, RCC_CarControllerV3 carController) {        
@@ -37,7 +41,17 @@ public class TrackCheckpoints : MonoBehaviour {
             Debug.Log("Correct");
 
             if (checkpointSingle == checkpointSingleList.Last()) {
-                EndRace(carController.GetComponent<RCC_PhotonNetwork>().isMine);
+                var isMe = carController.GetComponent<RCC_PhotonNetwork>().isMine;
+                string playerName = "";
+                if (isMe)
+                    playerName = PhotonNetwork.NickName;
+                else
+                    foreach (var player in PhotonNetwork.CurrentRoom.Players.Values) {
+                        if (player.NickName != PhotonNetwork.NickName)
+                            playerName = player.NickName;
+                    }
+                
+                EndRace(playerName,isMe);
                 return;
             }
 
@@ -57,9 +71,8 @@ public class TrackCheckpoints : MonoBehaviour {
         }
     }
 
-    private void EndRace(bool isMe) {
+    private void EndRace(string playerName,bool isMe) {
         print("EndRace");
-        OnPlayerLastCheckpoint?.Invoke(isMe);
-
+        OnPlayerLastCheckpoint?.Invoke(playerName,isMe);
     }
 }
