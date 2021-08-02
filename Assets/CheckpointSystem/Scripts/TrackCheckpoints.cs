@@ -14,6 +14,7 @@ public class TrackCheckpoints : MonoBehaviour {
 
     public List<CheckpointSingle> checkpointSingleList;
 
+    public RCC_CarControllerV3 carController;
     public List<RCC_CarControllerV3> carControllerList;
     private List<int> nextCheckpointSingleIndexList;
 
@@ -23,9 +24,12 @@ public class TrackCheckpoints : MonoBehaviour {
     }
 
     // TODO: Daha temiz yazılmalı
-    [ContextMenu("Refresh")]
+    [PunRPC]
     public void RefreshCarList() {
         carControllerList = FindObjectsOfType<RCC_CarControllerV3>().ToList();
+        foreach(var i in carControllerList)
+            Debug.Log(i.GetComponent<PhotonView>().Owner);
+        carControllerList.OrderBy(x=>x.GetComponent<PhotonView>().Owner);
 
         nextCheckpointSingleIndexList = new List<int>();
         for (int i = 0; i < carControllerList.Count; i++) {

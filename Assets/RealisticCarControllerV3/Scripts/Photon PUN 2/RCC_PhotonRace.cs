@@ -92,14 +92,15 @@ public class RCC_PhotonRace : MonoBehaviourPun {
         foreach(var rank in rankings) {
             rankList += rank + "\n";
         }
+        if (isMe) {
+            endPanel.SetActive(true);
+            rankingText.text = rankList;
+            Debug.Log(rankList);
 
-        endPanel.SetActive(true);
-        rankingText.text = rankList;
-        Debug.Log(rankList);
-
-        foreach (var car in trackCheckpoints.carControllerList) {
-            if (car.GetComponent<RCC_PhotonNetwork>().isMine)
-                car.SetCanControl(false);
+            foreach (var car in trackCheckpoints.carControllerList) {
+                if (car.GetComponent<RCC_PhotonNetwork>().isMine)
+                    car.SetCanControl(false);
+            }
         }
     }
 
