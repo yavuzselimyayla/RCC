@@ -84,8 +84,7 @@ public class RCC_PhotonManager : Photon.Pun.MonoBehaviourPunCallbacks {
 
 		print("Joining to random room has failed!, Creating new room...");
 		RCC_InfoLabel.Instance.ShowInfo ("Joining to random room has failed!, Creating new room...");
-		Photon.Pun.PhotonNetwork.CreateRoom(null);
-
+		PhotonNetwork.CreateRoom(null);
 	} 
 
 	public override void OnJoinedRoom(){

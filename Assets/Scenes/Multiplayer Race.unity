@@ -1235,6 +1235,7 @@ MonoBehaviour:
   - {fileID: 1274556747}
   - {fileID: 1886042934}
   - {fileID: 1674183355}
+  carController: {fileID: 0}
   carControllerList: []
 --- !u!1 &96938172
 GameObject:
@@ -7117,7 +7118,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Start
+  m_Text: Quick Match
 --- !u!222 &731585675
 CanvasRenderer:
   m_ObjectHideFlags: 0

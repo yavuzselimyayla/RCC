@@ -17,9 +17,11 @@ public class RCC_PhotonRace : MonoBehaviourPun {
     public GameObject endPanel;
     public Text rankingText;
 
+    int numberPlayers = 0;
+
     public void SelectVehicle(int index) => selectedCarIndex = index;
 
-   public void ReadyRace() {
+    public void ReadyRace() {
         Spawn();
         trackCheckpoints.OnPlayerLastCheckpoint += TrackCheckpoints_OnPlayerLastCheckpoint;
         StartCoroutine(Count());
@@ -33,13 +35,13 @@ public class RCC_PhotonRace : MonoBehaviourPun {
         }
     }
 
+    [PunRPC]
     private IEnumerator Count() {
-        yield return new WaitForSeconds(0.5f);
-
+        yield return new WaitForSeconds(2f);
         trackCheckpoints.RefreshCarList();
-        
+
         foreach (var car in trackCheckpoints.carControllerList)
-                car.SetCanControl(false);
+            car.SetCanControl(false);
 
         for (int i = countTime; i > 0; i--) {
             Debug.Log(i.ToString());
@@ -62,9 +64,12 @@ public class RCC_PhotonRace : MonoBehaviourPun {
             lastKnownRot = RCC_SceneManager.Instance.activePlayerVehicle.transform.rotation;
         }
 
+
+
         if (lastKnownPos == Vector3.zero) {
-            lastKnownPos = trackCheckpoints.raceStartPoints[PhotonNetwork.CurrentRoom.PlayerCount - 1].position;
-            lastKnownRot = trackCheckpoints.raceStartPoints[PhotonNetwork.CurrentRoom.PlayerCount - 1].rotation;
+            var index = PhotonNetwork.IsMasterClient ? 0 : 1;
+            lastKnownPos = trackCheckpoints.raceStartPoints[index].position;
+            lastKnownRot = trackCheckpoints.raceStartPoints[index].rotation;
         }
 
 
@@ -81,15 +86,14 @@ public class RCC_PhotonRace : MonoBehaviourPun {
 
         if (RCC_SceneManager.Instance.activePlayerCamera)
             RCC_SceneManager.Instance.activePlayerCamera.SetTarget(newVehicle.gameObject);
-        
+
         trackCheckpoints.carControllerList.Add(newVehicle);
     }
 
-
     public void TrackCheckpoints_OnPlayerLastCheckpoint(string playerName, bool isMe) {
-        rankings.Add($"{rankings.Count+1}. {playerName}");
+        rankings.Add($"{rankings.Count + 1}. {playerName}");
         string rankList = "";
-        foreach(var rank in rankings) {
+        foreach (var rank in rankings) {
             rankList += rank + "\n";
         }
         if (isMe) {
