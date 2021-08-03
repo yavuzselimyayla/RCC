@@ -17,8 +17,6 @@ public class RCC_PhotonRace : MonoBehaviourPun {
     public GameObject endPanel;
     public Text rankingText;
 
-    int numberPlayers = 0;
-
     public void SelectVehicle(int index) => selectedCarIndex = index;
 
     public void ReadyRace() {
@@ -35,9 +33,8 @@ public class RCC_PhotonRace : MonoBehaviourPun {
         }
     }
 
-    [PunRPC]
     private IEnumerator Count() {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
         trackCheckpoints.RefreshCarList();
 
         foreach (var car in trackCheckpoints.carControllerList)
@@ -49,6 +46,7 @@ public class RCC_PhotonRace : MonoBehaviourPun {
 
             yield return new WaitForSeconds(1);
         }
+        //photonView.RPC("BeginRace", RpcTarget.All);
         BeginRace();
     }
 
@@ -64,14 +62,11 @@ public class RCC_PhotonRace : MonoBehaviourPun {
             lastKnownRot = RCC_SceneManager.Instance.activePlayerVehicle.transform.rotation;
         }
 
-
-
         if (lastKnownPos == Vector3.zero) {
             var index = PhotonNetwork.IsMasterClient ? 0 : 1;
             lastKnownPos = trackCheckpoints.raceStartPoints[index].position;
             lastKnownRot = trackCheckpoints.raceStartPoints[index].rotation;
         }
-
 
         lastKnownRot.x = 0f;
         lastKnownRot.z = 0f;
@@ -83,11 +78,10 @@ public class RCC_PhotonRace : MonoBehaviourPun {
 
         RCC.RegisterPlayerVehicle(newVehicle);
         RCC.SetControl(newVehicle, false);
+        newVehicle.SetCanControl(false);
 
         if (RCC_SceneManager.Instance.activePlayerCamera)
             RCC_SceneManager.Instance.activePlayerCamera.SetTarget(newVehicle.gameObject);
-
-        trackCheckpoints.carControllerList.Add(newVehicle);
     }
 
     public void TrackCheckpoints_OnPlayerLastCheckpoint(string playerName, bool isMe) {
@@ -99,13 +93,14 @@ public class RCC_PhotonRace : MonoBehaviourPun {
         if (isMe) {
             endPanel.SetActive(true);
             rankingText.text = rankList;
-            Debug.Log(rankList);
 
-            foreach (var car in trackCheckpoints.carControllerList) {
+            foreach (var car in trackCheckpoints.carControllerList)
                 if (car.GetComponent<RCC_PhotonNetwork>().isMine)
                     car.SetCanControl(false);
-            }
         }
+        else
+            rankingText.text = rankList;
+
     }
 
     public void RestartScene() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);

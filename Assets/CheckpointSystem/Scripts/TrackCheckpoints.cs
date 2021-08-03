@@ -18,7 +18,7 @@ public class TrackCheckpoints : MonoBehaviour {
     public List<RCC_CarControllerV3> carControllerList;
     private List<int> nextCheckpointSingleIndexList;
 
-
+    public bool isMine;
     private void Awake() {
         foreach (var checkpointSingle in checkpointSingleList)
             checkpointSingle.SetTrackCheckpoints(this);
@@ -27,7 +27,6 @@ public class TrackCheckpoints : MonoBehaviour {
     // TODO: Daha temiz yazılmalı
     public void RefreshCarList() {
         carControllerList = FindObjectsOfType<RCC_CarControllerV3>().ToList();
-
         nextCheckpointSingleIndexList = new List<int>();
         for (int i = 0; i < carControllerList.Count; i++) {
             nextCheckpointSingleIndexList.Add(0);
@@ -35,27 +34,28 @@ public class TrackCheckpoints : MonoBehaviour {
     }
 
     public void CarThroughCheckpoint(CheckpointSingle checkpointSingle, RCC_CarControllerV3 carController) {
+        isMine = carController.GetComponent<RCC_PhotonNetwork>().isMine;
         int nextCheckpointSingleIndex = nextCheckpointSingleIndexList[carControllerList.IndexOf(carController)];
         if (checkpointSingleList.IndexOf(checkpointSingle) == nextCheckpointSingleIndex) {
             // Correct checkpoint
             Debug.Log("Correct");
 
             if (checkpointSingle == checkpointSingleList.Last()) {
-                var isMe = carController.GetComponent<RCC_PhotonNetwork>().isMine;
                 string playerName = "";
-                if (isMe)
+                if (isMine)
                     playerName = PhotonNetwork.NickName;
                 else
                     foreach (var player in PhotonNetwork.CurrentRoom.Players.Values)
                         if (player.NickName != PhotonNetwork.NickName)
                             playerName = player.NickName;
 
-                EndRace(playerName, isMe);
+                EndRace(playerName, isMine);
                 return;
             }
 
             CheckpointSingle correctCheckpointSingle = checkpointSingleList[nextCheckpointSingleIndex];
-            correctCheckpointSingle.Hide();
+            if(isMine)
+                correctCheckpointSingle.Hide();
 
             nextCheckpointSingleIndexList[carControllerList.IndexOf(carController)]
                 = (nextCheckpointSingleIndex + 1) % checkpointSingleList.Count;
@@ -71,8 +71,8 @@ public class TrackCheckpoints : MonoBehaviour {
         }
     }
 
-    private void EndRace(string playerName, bool isMe) {
+    private void EndRace(string playerName, bool isMine) {
         print("EndRace");
-        OnPlayerLastCheckpoint?.Invoke(playerName, isMe);
+        OnPlayerLastCheckpoint?.Invoke(playerName, isMine);
     }
 }
