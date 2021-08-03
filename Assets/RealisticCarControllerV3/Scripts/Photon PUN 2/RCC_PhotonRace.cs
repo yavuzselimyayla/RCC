@@ -48,7 +48,6 @@ public class RCC_PhotonRace : MonoBehaviourPun {
         }
         PhotonView photonView = PhotonView.Get(this);
         photonView.RPC("BeginRace", RpcTarget.All);
-        //BeginRace();
     }
 
     public void Spawn() {

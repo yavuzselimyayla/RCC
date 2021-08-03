@@ -24,7 +24,6 @@ public class TrackCheckpoints : MonoBehaviour {
             checkpointSingle.SetTrackCheckpoints(this);
     }
 
-    // TODO: Daha temiz yazılmalı
     public void RefreshCarList() {
         carControllerList = FindObjectsOfType<RCC_CarControllerV3>().ToList();
         nextCheckpointSingleIndexList = new List<int>();
