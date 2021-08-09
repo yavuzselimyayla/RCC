@@ -455,10 +455,13 @@ public class RCC_WheelCollider : MonoBehaviour {
 		// If scene has skidmarks manager...
 		if(!RCCSettings.dontUseSkidmarks){
 
+			Vector3 skidPoint = GroundHit.point + 2f * (rigid.velocity) * Time.deltaTime;
+			skidmarksManager.AddTrack(skidPoint);
+
 			// If slips are bigger than target value...
 			if (totalSlip > physicsFrictions [groundIndex].slip){
 
-				Vector3 skidPoint = GroundHit.point + 2f * (rigid.velocity) * Time.deltaTime;
+				//Vector3 skidPoint = GroundHit.point + 2f * (rigid.velocity) * Time.deltaTime;
 
 				if (rigid.velocity.magnitude > 1f) {
 
