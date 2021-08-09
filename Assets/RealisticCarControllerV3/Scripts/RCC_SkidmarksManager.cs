@@ -26,9 +26,7 @@ public class RCC_SkidmarksManager : MonoBehaviour {
 			skidmarks [i] = Instantiate (RCC_GroundMaterials.Instance.frictions [i].skidmark, Vector3.zero, Quaternion.identity);
 			skidmarks [i].transform.name = skidmarks[i].transform.name + "_" + RCC_GroundMaterials.Instance.frictions[i].groundMaterial.name;
 			skidmarks [i].transform.SetParent (transform, true);
-
 		}
-		
 	}
 	
 	// Function called by the wheels that is skidding. Gathers all the information needed to
